@@ -17,5 +17,16 @@ fn main() {
     let mut sim = Generations::new(n_gens);
     println!("Done: \n {:?}", sim);
     sim.generate_cell(0);
+    sim.cell_life_cycle(0);
     println!("Step 1: \n {:?}", sim);
+    sim.generate_cell(2);
+    sim.cell_life_cycle(2);
+    println!("Step 2: \n {:?}", sim);
+    sim.generate_cell(10);
+    sim.cell_life_cycle(10);
+    println!("Step 3: \n {:?}", sim);
+
+    for _i in 0 .. 10 {
+        sim.cell_life_cycle(0);
+    }
 }
