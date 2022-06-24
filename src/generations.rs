@@ -40,7 +40,8 @@ impl Generations {
         if i >= upper_index {  
             self.ngen += 1;
         }
-        self.gens.set(i, true)
+        self.gens.set(i, true);
+        self.cell_life_cycle(i);
     }
 
     pub fn cell_life_cycle(&mut self, i: usize) {
@@ -51,6 +52,12 @@ impl Generations {
         } else {
             if !self.will_die(i) {
                 println!("I am alive {:?}", i);
+                let index = from_gen_to_nodes(self.ngen); // FIXME store
+                let upper_index = from_gen_to_nodes(self.ngen+1); // FIXME store
+                let left_child = upper_index + (i - index)*2;
+                let right_child = upper_index + (i - index)*2 + 1;
+                self.generate_cell(left_child); 
+                self.generate_cell(right_child); 
             } else {
                 println!("I am dead {:?}", i);
                 self.gens.set(i, false);    
