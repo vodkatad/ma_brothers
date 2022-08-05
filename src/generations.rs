@@ -179,6 +179,20 @@ impl Generations {
         return anc0[u+1];
     }
 
+    pub fn find_mrca_two(& self, i0: usize, i1: usize) -> (usize, usize) {
+        let anc0 = self.find_ancestors(i0);
+        let anc1 = self.find_ancestors(i1);
+        let mut u = anc0.len()-1;
+        //println!("anc0: \n {:?}", anc0);
+        //println!("anc1: \n {:?}", anc1);
+        //println!("anc2: \n {:?}", anc2);
+        while anc0[u].0 == anc1[u].0 {
+            u = u - 1
+        }
+        return anc0[u+1];
+    }
+
+
     // The basic idea is that since we will be mainly working with set of three selected cells instead of going up in sync on the tree and stop ASAP
     // we get the list of all their ancestors and find the largest common one between the three vectors.
     // Instead of implementing the general approach we try to be more efficient knowing we will always work with three (2 or 1 will be excluded corner cases).

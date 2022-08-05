@@ -16,7 +16,7 @@ fn main() {
     }   
 
     //println!("Allocating your BitVec for {} generations", n_gens);
-    let fixed_n = 3;
+    let fixed_n = 2;
     for _i in 0..n_runs {
         let mut sim = Generations::new(n_gens);
         sim.generate_cell(0);  
@@ -28,7 +28,7 @@ fn main() {
             chosen.push(*i);
         }
         if chosen.len() >= fixed_n {
-            let mrca = sim.find_mrca_three(chosen[0], chosen[1], chosen[2]);
+            let mrca = sim.find_mrca_two(chosen[0], chosen[1]);
             println!("{}\t{}", mrca.0, mrca.1);
         } else {
             println!("{}\t{}", -1, -1);
