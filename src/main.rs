@@ -17,7 +17,8 @@ fn main() {
     let mut sim = Generations::new(n_gens);
     println!("Done: \n {:?}", sim);
     sim.generate_cell(0);
-    sim.select_rand_last_gen();
+    let random_last = sim.select_rand_last_gen(3);
+    println!("Random: \n {:?}", random_last);
     //sim.cell_life_cycle(0);
     /*println!("Step 1: \n {:?}", sim);
     sim.generate_cell(2);
