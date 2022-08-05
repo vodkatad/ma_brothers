@@ -8,7 +8,7 @@ use std::collections::HashSet;
 
 // const NN: f64 = 0f64;
 const BASE: usize = 2;
-const UNDEAD: f32 = 0.99;
+const UNDEAD: f32 = 0.9;
 
 /// Struct used to store a binary vector representing the tree with cells generations.
 #[derive(Debug)]
@@ -20,10 +20,6 @@ pub struct Generations {
 
 /// Computes the index of the first leaf (leftmost) in generation gen+1
 fn from_gen_to_nodes(gen: usize) -> usize {
-    //let mut res: usize = 0;
-    //for i in 0..gen {
-    //    res = res + (BASE^i);
-    //}
     // A complete binary tree with h gen has 2^(gen+1) - 1 nodes
     return BASE.pow(gen as u32 +1)-1;
 }
@@ -91,8 +87,7 @@ impl Generations {
                 alive_indexes.push(i);
             }
         }
-        //println!("{:?} {:?} {:?}", alive_indexes, lower_index, upper_index);
-
+        println!("alive\t{}", alive_indexes.len());
         return alive_indexes;
     }
 
