@@ -4,10 +4,11 @@
 use bit_vec::BitVec;
 use rand::Rng;
 use std::collections::HashSet;
+//use rand::distributions::{Bernoulli, Distribution};
 
 // const NN: f64 = 0f64;
 const BASE: usize = 2;
-const UNDEAD: f32 = 0.9;
+const UNDEAD: f32 = 0.99;
 
 /// Struct used to store a binary vector representing the tree with cells generations.
 #[derive(Debug)]
@@ -50,8 +51,8 @@ impl Generations {
 
     pub fn cell_life_cycle(&mut self, i: usize) {
         if !self.will_die(i) {
-            println!("I am alive {:?}", i);
-            println!("{:?}", self);
+            //println!("I am alive {:?}", i);
+            //println!("{:?}", self);
             //println!("{:?}", self.ngen);
             //println!("{:?}", self.gens.len());
             let mut index = 0;
@@ -65,7 +66,7 @@ impl Generations {
             self.generate_cell(left_child); 
             self.generate_cell(right_child); 
         } else {
-            println!("I am dead {:?}", i);
+            //println!("I am dead {:?}", i);
             self.gens.set(i, false);    
         }
     }
@@ -90,7 +91,7 @@ impl Generations {
                 alive_indexes.push(i);
             }
         }
-        println!("{:?} {:?} {:?}", alive_indexes, lower_index, upper_index);
+        //println!("{:?} {:?} {:?}", alive_indexes, lower_index, upper_index);
 
         return alive_indexes;
     }
@@ -141,22 +142,22 @@ impl Generations {
     /// Function that given the index of a cell in the last generation returns the list of its ancestors.
     /// Unchecked precondition: given indexes come from alive cells.
     /// Would it be less awkward if recursive?
-    pub fn find_ancestors(& self, mut i: usize) -> Vec::<usize> {
-        let mut ancestors_indexes = Vec::<usize>::with_capacity(self.ngen);
+    pub fn find_ancestors(& self, mut i: usize) -> Vec::<(usize, usize)> {
+        let mut ancestors_indexes = Vec::<(usize, usize)>::with_capacity(self.ngen);
         let mut lower_index = from_gen_to_nodes(self.ngen-1);
         let mut upper_index = from_gen_to_nodes(self.ngen); 
         let mut reached_gen = self.ngen-1;
         if self.ngen != 0 {
             let mut father_index = self.get_father(i, upper_index, lower_index);
             while father_index != 0 {
-                ancestors_indexes.push(father_index);
+                ancestors_indexes.push((father_index, reached_gen));
                 reached_gen = reached_gen - 1;
                 upper_index = lower_index;
                 lower_index = from_gen_to_nodes(reached_gen);
                 i = father_index;
                 father_index = self.get_father(i, upper_index, lower_index);
             }
-            ancestors_indexes.push(father_index);
+            ancestors_indexes.push((father_index, reached_gen));
         } 
         return ancestors_indexes
     }
@@ -167,17 +168,17 @@ impl Generations {
 
     //}
 
-    // Function that given indexes of three cells returns the index/generation of their most recent common ancestor.
+    // Function that given indexes of three cells returns the (index, generation) of their most recent common ancestor.
     // Unchecked precondition: given indexes come from alive cells.
-    pub fn find_mrca_three(& self, i0: usize, i1: usize, i2: usize) -> usize {
+    pub fn find_mrca_three(& self, i0: usize, i1: usize, i2: usize) -> (usize, usize) {
         let anc0 = self.find_ancestors(i0);
         let anc1 = self.find_ancestors(i1);
         let anc2 = self.find_ancestors(i2);
         let mut u = anc0.len()-1;
-        println!("anc0: \n {:?}", anc0);
-        println!("anc1: \n {:?}", anc1);
-        println!("anc2: \n {:?}", anc2);
-        while anc0[u] == anc1[u] && anc1[u] == anc2[u] {
+        //println!("anc0: \n {:?}", anc0);
+        //println!("anc1: \n {:?}", anc1);
+        //println!("anc2: \n {:?}", anc2);
+        while anc0[u].0 == anc1[u].0 && anc1[u].0 == anc2[u].0 {
             u = u - 1
         }
         return anc0[u+1];
