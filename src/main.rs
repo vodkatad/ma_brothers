@@ -17,8 +17,15 @@ fn main() {
     let mut sim = Generations::new(n_gens);
     println!("Done: \n {:?}", sim);
     sim.generate_cell(0);
-    let random_last = sim.select_rand_last_gen(3);
+    let fixed_n = 3;
+    let random_last = sim.select_rand_last_gen(fixed_n);
     println!("Random: \n {:?}", random_last);
+    let mut chosen = Vec::<usize>::with_capacity(fixed_n);
+    for i in random_last.iter() {
+        chosen.push(*i);
+    }
+    println!("MRCA: \n {:?}", sim.find_mrca_three(chosen[0], chosen[1], chosen[2]));
+
     //sim.cell_life_cycle(0);
     /*println!("Step 1: \n {:?}", sim);
     sim.generate_cell(2);

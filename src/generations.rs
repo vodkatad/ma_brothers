@@ -7,7 +7,7 @@ use std::collections::HashSet;
 
 // const NN: f64 = 0f64;
 const BASE: usize = 2;
-const UNDEAD: f32 = 0.8;
+const UNDEAD: f32 = 0.9;
 
 /// Struct used to store a binary vector representing the tree with cells generations.
 #[derive(Debug)]
@@ -108,6 +108,7 @@ impl Generations {
         // We use a set to avoid picking more than once the same cell.
         let mut chosen_alive = HashSet::<usize>::with_capacity(n_res);
         // TODO is this the correct way to extract n_res random elements?
+        // sometimes this will give us more than n_res, obviously. But if I switch the two loops obviously again it never ends.
         while chosen_alive.len() < n_res {
             for index_a in &alive_cells {
                 if self.rng.gen_range(0.0..1.0) < prob_for_one {
@@ -115,6 +116,74 @@ impl Generations {
                 }
             }
         }
+        // FIXME there should be a better solution (two loops?)
+        /*let mut chosen_alive_it = chosen_alive.iter();
+        while chosen_alive.len() > n_res {
+            chosen_alive.remove(chosen_alive_it.next().unwrap());
+        }*/
         return chosen_alive;
     }
+
+    pub fn get_father(& self, i: usize, n_gen_mine: usize, n_gen_upper: usize) -> usize {
+        let father_i : f32;
+        if i > 0 {
+            father_i = ((i as f32) / (BASE as f32)) + (n_gen_upper as f32) - ((n_gen_mine as f32) / (BASE as f32));
+        } else {
+            return 0;
+        }
+        if i % 2 == 0 { // right children
+            return (father_i - 0.5) as usize;
+        } else { // left children
+            return father_i as usize;
+        }
+    }
+
+    /// Function that given the index of a cell in the last generation returns the list of its ancestors.
+    /// Unchecked precondition: given indexes come from alive cells.
+    /// Would it be less awkward if recursive?
+    pub fn find_ancestors(& self, mut i: usize) -> Vec::<usize> {
+        let mut ancestors_indexes = Vec::<usize>::with_capacity(self.ngen);
+        let mut lower_index = from_gen_to_nodes(self.ngen-1);
+        let mut upper_index = from_gen_to_nodes(self.ngen); 
+        let mut reached_gen = self.ngen-1;
+        if self.ngen != 0 {
+            let mut father_index = self.get_father(i, upper_index, lower_index);
+            while father_index != 0 {
+                ancestors_indexes.push(father_index);
+                reached_gen = reached_gen - 1;
+                upper_index = lower_index;
+                lower_index = from_gen_to_nodes(reached_gen);
+                i = father_index;
+                father_index = self.get_father(i, upper_index, lower_index);
+            }
+            ancestors_indexes.push(father_index);
+        } 
+        return ancestors_indexes
+    }
+
+    // Function that given indexes of two cells returns the index/generation of their most recent common ancestor.
+    // Unchecked precondition: given indexes come from alive cells.
+    //pub fn find_mrca(& self, i: usize, j: usize) {
+
+    //}
+
+    // Function that given indexes of three cells returns the index/generation of their most recent common ancestor.
+    // Unchecked precondition: given indexes come from alive cells.
+    pub fn find_mrca_three(& self, i0: usize, i1: usize, i2: usize) -> usize {
+        let anc0 = self.find_ancestors(i0);
+        let anc1 = self.find_ancestors(i1);
+        let anc2 = self.find_ancestors(i2);
+        let mut u = anc0.len()-1;
+        println!("anc0: \n {:?}", anc0);
+        println!("anc1: \n {:?}", anc1);
+        println!("anc2: \n {:?}", anc2);
+        while anc0[u] == anc1[u] && anc1[u] == anc2[u] {
+            u = u - 1
+        }
+        return anc0[u+1];
+    }
+
+    // The basic idea is that since we will be mainly working with set of three selected cells instead of going up in sync on the tree and stop ASAP
+    // we get the list of all their ancestors and find the largest common one between the three vectors.
+    // Instead of implementing the general approach we try to be more efficient knowing we will always work with three (2 or 1 will be excluded corner cases).
 }
