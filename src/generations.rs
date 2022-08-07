@@ -96,27 +96,17 @@ impl Generations {
 
         let alive_cells = self.alive_last_gen();
         let n_alive = alive_cells.len();
-        let prob_for_one = 1.0 / n_alive as f32;
         let mut n_res = n;
         if n > n_alive {
             n_res = n_alive;
         }
         // We use a set to avoid picking more than once the same cell.
         let mut chosen_alive = HashSet::<usize>::with_capacity(n_res);
-        // TODO is this the correct way to extract n_res random elements?
-        // sometimes this will give us more than n_res, obviously. But if I switch the two loops obviously again it never ends.
         while chosen_alive.len() < n_res {
-            for index_a in &alive_cells {
-                if self.rng.gen_range(0.0..1.0) < prob_for_one {
-                    chosen_alive.insert(*index_a);
-                }
-            }
+            let rand_fraction : f64 = self.rng.gen_range(0.0..1.0);
+            let index = (rand_fraction * n_alive as f64) as usize;
+            chosen_alive.insert(alive_cells[index]);
         }
-        // FIXME there should be a better solution (two loops?)
-        /*let mut chosen_alive_it = chosen_alive.iter();
-        while chosen_alive.len() > n_res {
-            chosen_alive.remove(chosen_alive_it.next().unwrap());
-        }*/
         return chosen_alive;
     }
 
