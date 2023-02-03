@@ -166,7 +166,7 @@ impl Generations {
         //println!("anc0: \n {:?}", anc0);
         //println!("anc1: \n {:?}", anc1);
         //println!("anc2: \n {:?}", anc2);
-        while anc0[u].0 == anc1[u].0 && anc1[u].0 == anc2[u].0 {
+        while u > 0 && anc0[u].0 == anc1[u].0 && anc1[u].0 == anc2[u].0 {
             u = u - 1
         }
         return anc0[u+1];
@@ -178,8 +178,8 @@ impl Generations {
         let mut u = anc0.len()-1;
         //println!("anc0: \n {:?}", anc0);
         //println!("anc1: \n {:?}", anc1);
-        println!("DEBUG {:?} {:?} {}", anc0, anc1, self.ngen);
-        while anc0[u].0 == anc1[u].0 {
+        //println!("DEBUG {:?} {:?} {}", anc0, anc1, self.ngen);
+        while (u as isize) >= 0 && anc0[u].0 == anc1[u].0 {
             u = u - 1
         }
         return anc0[u+1];

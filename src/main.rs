@@ -63,7 +63,7 @@ fn main() {
                     }
                     for c1 in 0..BOTTLEN {
                         for c2 in (c1+1)..BOTTLEN {
-                            println!("anc\t{}\t{}", c1, c2);
+                            //println!("anc\t{}\t{}", c1, c2);
                             rounds[i][c1][c2] = sim.find_mrca_two(chosen[c1], chosen[c2]);    
                             // At the first level we store a single number rather than a tuple
                         }
