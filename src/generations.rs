@@ -178,7 +178,7 @@ impl Generations {
         let mut u = anc0.len()-1;
         //println!("anc0: \n {:?}", anc0);
         //println!("anc1: \n {:?}", anc1);
-        //println!("anc2: \n {:?}", anc2);
+        println!("DEBUG {:?} {:?} {}", anc0, anc1, self.ngen);
         while anc0[u].0 == anc1[u].0 {
             u = u - 1
         }
@@ -191,5 +191,16 @@ impl Generations {
     // Instead of implementing the general approach we try to be more efficient knowing we will always work with three (2 or 1 will be excluded corner cases).
 
     // Do we need to implement the real experiment?
-    // Sim would need to starts from 1 cell, then is curbed to random 100 and goes on.
+    // Sim would need to starts from 1 cell, then 100 random are selected, keep track of ancestors with data structure:
+    // idtree id1 id2 anc as a matrix
+    // simulate 100 trees, then pick randomly other 100 -> put together all alive and pick from there -> {idtree -> id}
+    // then for all idtree keys if more than one ask common ancestor, otherwise 
+    // redo and and the end pick randomly 3
+
+    // at each level we will store a matrix of common ancestors
+    // cells ids will be 1..100 (0 is the first cell/tree), for 101 and 102 if we see -1 it means they do not derive from the same tree, 
+    // so when we get to them (when coming up from the last level) we'll need to ask the common ancestor at the upper level.
+    // if instead of (-1, -1) we store (treeid1, treeid2) we can refer to the previous matrix (idtree=idcell)
+    // if we store two equal ids we know this is the level of a common ancestor inside a tree
 }
+
