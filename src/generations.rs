@@ -8,13 +8,15 @@ use std::collections::HashSet;
 
 // const NN: f64 = 0f64;
 const BASE: usize = 2;
-const UNDEAD: f32 = 0.9;
+//const UNDEAD: f32 = 0.9; // d / b
+//const DEAD: f32 = 0.9; // d / b
 
 /// Struct used to store a binary vector representing the tree with cells generations.
 #[derive(Debug)]
 pub struct Generations {
     gens: BitVec,
     ngen: usize, // the generation that we have reached
+    p_death: f32,
     rng: rand::rngs::ThreadRng,
 }
 
@@ -28,8 +30,8 @@ impl Generations {
     /// Creates a new generation simulation structure, pre-allocating all the needed generations.
     // Since we generate the tree depth first tracking ngen is not that useful - we are calculating base indexes to get
     // children indexes right now.
-    pub fn new(n: usize) -> Generations {
-        Generations { gens: BitVec::from_elem(from_gen_to_nodes(n), false), ngen: 0, rng: rand::thread_rng() }
+    pub fn new(n: usize, p: f32) -> Generations {
+        Generations { gens: BitVec::from_elem(from_gen_to_nodes(n), false), ngen: 0, rng: rand::thread_rng(), p_death: p}
     }
 
     pub fn generate_cell(&mut self, i: usize) {
@@ -70,7 +72,7 @@ impl Generations {
     pub fn will_die(&mut self, _i: usize) -> bool {
         // We keep the index _i here just in case in the future we want to simulate different classes of cells.
         // random distributions https://docs.rs/rand_distr/0.4.3/rand_distr/index.html
-        return self.rng.gen_range(0.0..1.0) > UNDEAD
+        return self.rng.gen_range(0.0..1.0) < self.p_death
     }
 
     /// Returns a vector with indexes of alive cells in the last generation of our tree.
@@ -87,14 +89,14 @@ impl Generations {
                 alive_indexes.push(i);
             }
         }
-        println!("alive\t{}", alive_indexes.len());
+        //println!("alive\t{}", alive_indexes.len());
         return alive_indexes;
     }
 
     /// Return n random alive cells from last generation, return their indexes.
-    pub fn select_rand_last_gen(& mut self, n: usize) -> HashSet::<usize> {
+    pub fn select_rand_last_gen(& mut self, n: usize, alive_cells: Vec::<usize>) -> HashSet::<usize> {
 
-        let alive_cells = self.alive_last_gen();
+        //let alive_cells = self.alive_last_gen();
         let n_alive = alive_cells.len();
         let mut n_res = n;
         if n > n_alive {
@@ -159,7 +161,8 @@ impl Generations {
         let anc0 = self.find_ancestors(i0);
         let anc1 = self.find_ancestors(i1);
         let anc2 = self.find_ancestors(i2);
-        let mut u = anc0.len()-1;
+        let mut u = anc0.len()-1; // u is the last index, all ancestors are supposed to have the same len
+        // this is true if we only pick cells from last generation though in reality (in the sim we are forcing this).
         //println!("anc0: \n {:?}", anc0);
         //println!("anc1: \n {:?}", anc1);
         //println!("anc2: \n {:?}", anc2);
@@ -186,4 +189,7 @@ impl Generations {
     // The basic idea is that since we will be mainly working with set of three selected cells instead of going up in sync on the tree and stop ASAP
     // we get the list of all their ancestors and find the largest common one between the three vectors.
     // Instead of implementing the general approach we try to be more efficient knowing we will always work with three (2 or 1 will be excluded corner cases).
+
+    // Do we need to implement the real experiment?
+    // Sim would need to starts from 1 cell, then is curbed to random 100 and goes on.
 }

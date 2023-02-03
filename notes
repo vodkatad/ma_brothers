@@ -1,0 +1,28 @@
+#data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ time ./target/release/ma_brothers  -g 15 -n 100 > 100run_65gens_bd06.tsv
+
+
+data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ grep  tree 100run_65gens_bd06.tsv | awk '$3!=0' | wc -l
+11
+data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ grep  tree 100run_65gens_bd06.tsv | awk '$3==0' | wc -l
+89
+
+data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ grep  anc 100run_65gens_bd06.tsv  | awk '$2 != -1' 
+anc     319     8
+anc     582     9
+anc     3891    11
+anc     4365    12
+anc     5664    12
+anc     108     6
+
+
+data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ grep tree 100run_65gens_bd09.tsv  | awk '$3!=0' | wc -l
+0
+data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ grep tree 100run_65gens_bd06.tsv  | awk '$3!=0' | wc -l
+2
+data@rotpunkt:~/Dropbox/work/evol/MA/coalescence/ma_brothers$ grep tree 100run_65gens_bd03.tsv  | awk '$3!=0' | wc -l
+60
+
+I get results compatible (-g 15 alive cells *100) with Vale's counts with beta 0.7, d/b or whatever, prob of
+dying before dividing, 0.3.
+0.1 far too many
+0.5 I will have 1 cell on avg
