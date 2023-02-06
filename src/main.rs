@@ -50,27 +50,31 @@ fn main() {
         let mut rounds = vec![vec![vec![(42,42); BOTTLEN]; BOTTLEN]; N];
         for i in 0..rounds.len() {
             if i == 0 {
-                let mut sim = Generations::new(n_gens, p_death);
-                sim.generate_cell(0);  
-                let alive = sim.alive_last_gen();
-                if alive.len() < BOTTLEN {
-                    println!("Failed cloning {}", alive.len());
-                } else {
-                    let random_last = sim.select_rand_last_gen(BOTTLEN, alive);
-                    let mut chosen = Vec::<usize>::with_capacity(BOTTLEN);
-                    for i in random_last.iter() {
-                        chosen.push(*i);
+                let mut n;
+                let mut alive:  Vec::<usize>;
+                let mut sim: Generations;
+                loop { 
+                    sim = Generations::new(n_gens, p_death);
+                    sim.generate_cell(0);  
+                    alive = sim.alive_last_gen();
+                    n = alive.len();
+                    if n >= BOTTLEN {
+                        break
                     }
-                    for c1 in 0..BOTTLEN {
-                        for c2 in (c1+1)..BOTTLEN {
-                            //println!("anc\t{}\t{}", c1, c2);
-                            rounds[i][c1][c2] = sim.find_mrca_two(chosen[c1], chosen[c2]);    
-                            // At the first level we store a single number rather than a tuple
-                        }
+                }
+                let random_last = sim.select_rand_last_gen(BOTTLEN, alive);
+                let mut chosen = Vec::<usize>::with_capacity(BOTTLEN);
+                for i in random_last.iter() {
+                    chosen.push(*i);
+                }
+                for c1 in 0..BOTTLEN {
+                    for c2 in (c1+1)..BOTTLEN {
+                        //println!("anc\t{}\t{}", c1, c2);
+                        rounds[i][c1][c2] = sim.find_mrca_two(chosen[c1], chosen[c2]);    
                     }
                 }
             } else {
-                // TODO
+                // call fx that does BOTTLEN simulations and fill rounds[1:3]
             }
         }
         for c1 in 0..BOTTLEN {
@@ -79,4 +83,29 @@ fn main() {
             }
         }
     }
+}
+
+
+// mess between n_trees, n_bottle and :(
+fn simulate_bottlenecks(n_bottle: usize, n_gens: usize, p_death: f32, n_bottlenecks: usize) -> Vec<Vec<(usize, usize)>> {
+    let n_trees = n_bottlenecks - 1; // substitute with n of leaf in a three with this height TODO
+    let mut trees_index_in_alive = vec![0; n_bottle*n_trees]; 
+    let mut alive_cells = Vec::<usize>::with_capacity(2_usize.pow(n_gens as u32)*n_trees);
+    for i in 0 .. n_bottle {
+        let a = simulate_bottleneck_run(n_gens, p_death);
+        trees_index_in_alive[i] = a.len();
+        alive_cells.extend(a);
+    }
+    // pick 100 random from alive_cells
+    // iterate on all pairs of alive, if they are from different trees store (tree_id1, tree_id2)
+    // if they are from the same determine common ancestor and store (level, level)
+    // we'll need a mock Generations to do so.
+
+    return vec![vec![(0,0)]]
+}
+
+fn simulate_bottleneck_run(n_gens: usize, p_death: f32) -> Vec<usize> {
+    let mut sim = Generations::new(n_gens, p_death);
+    sim.generate_cell(0);  
+    return sim.alive_last_gen();
 }
